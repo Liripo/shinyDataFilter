@@ -178,7 +178,7 @@ shiny_data_filter <- function(input, output, session, data,
       label = NULL,
       data = datar,
       choices = choices,
-      placeholder = "Add Filter",
+      placeholder = " ",
       width = "100%")
   })
 

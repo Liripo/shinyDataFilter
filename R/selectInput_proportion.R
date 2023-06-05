@@ -14,38 +14,29 @@
 #' @importFrom shiny selectizeInput
 #'
 proportionSelectInput <- function(inputId, label, vec, selected = "", ...,
-    placeholder = "", onInitialize, sort = c("count", "alpha", "order")) {
-
+                                  placeholder = "", onInitialize, sort = c("count", "alpha", "order")) {
   sort <- match.arg(sort, c("count", "alpha", "order"), several.ok = FALSE)
 
   vecr <- if (is.reactive(vec)) vec else reactive(vec)
 
-  vecr_counts <- sort(table(vecr()), decreasing = TRUE)
-  vecr_names <- names(vecr_counts)
-  vecr_counts <- as.numeric(vecr_counts)
-  names(vecr_counts) <- vecr_names
-  vecr_props  <- vecr_counts / sum(vecr_counts)
-
-  if (sort == "count") {
-    vecr_unique <- names(vecr_counts)
-  } else if (sort == "alpha") {
-    vecr_unique <- as.character(sort(unique(Filter(Negate(is.na), vecr()))))
+  if (!is.null(vecr())) {
+    vecr_counts <- sort(table(vecr()), decreasing = TRUE) |>
+      as.data.frame()
+    colnames(vecr_counts) <- c("name", "count")
+    vecr_counts$prop <- vecr_counts$count / sum(vecr_counts$count)
+    
+    labels <- sprintf('{
+          "name": "%s",
+          "prop": %f,
+          "count": %d
+        }', vecr_counts$name, vecr_counts$prop, vecr_counts$count)
+    
+    choices <- as.list(as.character(vecr_counts$name))
+    names(choices) <- labels
   } else {
-    vecr_unique <- unique(Filter(Negate(is.na), vecr()))
+    choices <- NULL
   }
-
-  labels <- Map(function(v) {
-    json <- sprintf(strip_leading_ws('
-    {
-      "name": "%s",
-      "prop": %f,
-      "count": %d
-    }'),
-    v, vecr_props[[v]], vecr_counts[[v]])
-  }, vecr_unique)
-
-  choices <- as.list(vecr_unique)
-  names(choices) <- labels
+  
 
   shiny::selectizeInput(
     inputId = inputId,
@@ -58,7 +49,7 @@ proportionSelectInput <- function(inputId, label, vec, selected = "", ...,
         // format the way that options are rendered
         option: function(item, escape) {
           item.data = JSON.parse(item.label);
-          return '<div style=\"position: relative;\">' +
+          return '<div style=\"position: relative; padding: 3px 12px\">' +
                     '<div style=\"position: absolute; top: 5%; bottom: 5%; left: 0%; width: ' + item.data.prop * 100 + '%; background-color: #428BCA; opacity: 0.2;\"></div>' +
                     '<div style=\"z-index: 1;\">' +
                       escape(item.data.name) + ' ' +
@@ -84,7 +75,6 @@ proportionSelectInput <- function(inputId, label, vec, selected = "", ...,
       list(onType = I("function(str) {
         str || this.$dropdown_content.removeHighlight();
       }")),
-
       list(onChange = I("function() {
         this.$dropdown_content.removeHighlight();
       }")),
@@ -95,16 +85,20 @@ proportionSelectInput <- function(inputId, label, vec, selected = "", ...,
       }")),
 
       # placeholder
-      if (missing(placeholder)) list()
-      else list(placeholder = placeholder),
+      if (missing(placeholder)) {
+        list()
+      } else {
+        list(placeholder = placeholder)
+      },
 
       # onInitialize
-      if (missing(onInitialize) && !missing(placeholder))
+      if (missing(onInitialize) && !missing(placeholder)) {
         list(onInitialize = I('function() { this.setValue(""); }'))
-      else if (!missing(onInitialize))
+      } else if (!missing(onInitialize)) {
         list(onInitialize = onInitialize)
-      else
+      } else {
         list()
+      }
     )
   )
 }

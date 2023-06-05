@@ -18,11 +18,13 @@ shiny_vector_filter.character <- function(data, inputId, ...) {
     module_return <- shiny::reactiveValues(code = TRUE, mask = TRUE)
 
     output$ui <- shiny::renderUI({
-      filter_log("updating ui", verbose = verbose)
-      shiny::textInput(
-        ns("param"),
-        NULL,
+      # filter_log("updating ui", verbose = verbose)
+      shinyWidgets::searchInput(
+        inputId = ns("param"),
+        label = NULL,
+        placeholder = "模糊搜索",
         value = shiny::isolate(input$param),
+        btnSearch = icon("magnifying-glass"),
         width = "100%"
       )
     })

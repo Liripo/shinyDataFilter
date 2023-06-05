@@ -52,18 +52,28 @@ css_shinyDataFilter_style_script <- function() {
         right: 0;
         top: 50%;
       }
+      select[id$=\"add_filter_select\"] + div .selectize-input:before {
+        content: '\\2b 过滤';
+        font-family: FontAwesome;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 14px;
+        color: #0d6efd;
+      }
 
       select[id$=\"add_filter_select\"] + div .selectize-input {
         text-align: center;
         padding: 6px 12px;
         border: 1px #e3e3e3 solid;
         border-radius: 4px;
-        background-color: #f5f5f5;
+        background-color: #ffffff;
       }
       
       select[id$=\"add_filter_select\"] + div .selectize-input:hover {
-        background-color: #e6e6e6;
-        border-color: #adadad;
+        background-color: #ffffff;
+        /* border-color: #0a58ca;*/
       }
 
       select[id$=\"add_filter_select\"] + div .selectize-input:after {

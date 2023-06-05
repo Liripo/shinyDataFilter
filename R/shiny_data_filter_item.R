@@ -72,12 +72,12 @@ shiny_data_filter_item <- function(input, output, session, data,
 
   # ui to show to select a new filter column
   column_select_ui <- shiny::fillRow(
-    flex = c(NA, 1, NA),
+    flex = c(1, NA),
     height = "40px",
-    shiny::h4(
-      style = "margin-right: 8px;",
-      shiny::icon("grip-vertical", class = "sortableJS-handle")
-    ),
+    # shiny::h6(
+    #   style = "margin-right: 8px;",
+    #   shiny::icon("grip-vertical", class = "sortableJS-handle")
+    # ),
     columnSelectInput(
       ns("column_select"),
       NULL,
@@ -86,7 +86,7 @@ shiny_data_filter_item <- function(input, output, session, data,
       multiple = TRUE,
       width = "100%"
     ),
-    shiny::h4(style = "float: right; margin: 8px 0px 0px 8px;",
+    shiny::h6(style = "float: right; margin: 8px 0px 0px 8px;",
       shiny::actionLink(
         ns("remove_filter_btn"),
         NULL,
@@ -97,33 +97,45 @@ shiny_data_filter_item <- function(input, output, session, data,
 
   # filter column-specific ui
   column_filter_ui <- shiny::tagList(
-    shiny::h4(
-      shiny::icon("grip-vertical", class = "sortableJS-handle"),
-      shiny::uiOutput(ns("column_name"), inline = TRUE),
-      shiny::actionLink(
-        ns("column_select_edit_btn"),
-        NULL,
-        shiny::icon("edit")),
-      shiny::div(style = "display: inline-block; opacity: 0.3; font-style: italic;",
-        shiny::HTML(paste0(
-          shiny::span("("),
-          shiny::textOutput(ns("nrow"), inline = TRUE),
-          shiny::uiOutput(ns("filter_na_btn_ui"), inline = TRUE),
-          shiny::span(")")))),
-      shiny::actionLink(ns("remove_filter_btn"), NULL,
-        style = 'float: right;',
-        shiny::icon("times-circle"))
+    shiny::div(class = "d-flex",
+      shiny::div(class = "me-auto flex-shrink-1",
+      shiny::h6(
+        shiny::icon("grip-vertical", class = "sortableJS-handle"),
+        shiny::uiOutput(ns("column_name"), inline = TRUE),
+        shiny::actionLink(style = "text-decoration: none;",
+          ns("column_select_edit_btn"),
+          NULL,
+          shiny::icon("edit")),
+        shiny::div(style = "display: inline-block; opacity: 0.3; font-style: italic;",
+          shiny::HTML(paste0(
+            shiny::span("("),
+            shiny::textOutput(ns("nrow"), inline = TRUE),
+            shiny::uiOutput(ns("filter_na_btn_ui"), inline = TRUE),
+            shiny::span(")"))
+          )
+        ))),
+      shiny::div(class = "",
+        shiny::actionLink(ns("remove_filter_btn"), NULL,
+          class = 'float: right;',
+          shiny::icon("times-circle"))
+      )
     ),
     shiny::uiOutput(ns("vector_filter_ui"))
   )
 
   ui <- shiny::eventReactive(module_return$column_name, ignoreNULL = FALSE, {
-    if (is.null(module_return$column_name)) column_select_ui
-    else column_filter_ui
+    if (is.null(module_return$column_name)) {
+      column_select_ui
+    } else {
+      column_filter_ui
+    }
   })
 
   output$ui <- shiny::renderUI({
-    filter_log("updating ui", verbose = verbose)
+    # filter_log("updating ui", verbose = verbose)
+    # if (is.null(module_return$column_name)) {
+    #   browser()
+    # }
     ui()
   })
 
@@ -214,13 +226,18 @@ shiny_data_filter_item <- function(input, output, session, data,
       list(.x = as.name(module_return$column_name))))
   })
 
+  # 计算
   module_return$data <- shiny::reactive({
     filter_log("providing data filtered by '",
       module_return$column_name, "'", verbose = verbose)
 
     out_data <- if (!nrow(data())) data()
     else {
-      out_data <- subset(data(), vector_module_return()$mask())
+      # 调试代码
+      # if (!isTRUE(vector_module_return()$code())) {
+      #   browser()
+      # }
+      out_data <- dplyr::filter(data(), vector_module_return()$mask())
       for (col in intersect(names(data()), names(out_data)))
         attributes(out_data[[col]]) <- attributes(data()[[col]])
       out_data

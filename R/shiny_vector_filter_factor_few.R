@@ -51,6 +51,10 @@ shiny_vector_filter_factor_few <- function(input, output, session,
 
   output$plot <- shiny::renderPlot(bg = 'transparent', {
     # Proportional
+    # 排除 NULL 报warnig情况
+    if (is.null(x_wo_NA())) {
+      return(NULL)
+    }
     ggplot2::ggplot() +
       # sort factor so that it reflects checkbox order
       ggplot2::aes(x = factor(

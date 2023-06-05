@@ -24,6 +24,8 @@ columnSelectInput <- function(inputId, label, data, choices = names,
   if (is.function(choices)) choices <- choices(datar())
   choices <- intersect(choices, names(datar()))
 
+  # 此处是否需要优化
+  # 去除 label 功能，意义不大
   labels <- Map(function(col) {
     json <- sprintf(strip_leading_ws('
     {
@@ -50,12 +52,12 @@ columnSelectInput <- function(inputId, label, data, choices = names,
         option: function(item, escape) {
           item.data = JSON.parse(item.label);
           return '<div>' +
-                   '<div><strong>' +
+                   '<div style= \"font-size: 14px;padding: 3px 12px;\">' +
                       escape(item.data.name) + ' ' +
                       '<span style=\"opacity: 0.3;\"><code style=\"color: black;\"> ' +
                         item.data.datatype +
                       '</code></span>' +
-                   '</strong></div>' +
+                   '</div>' +
                    (item.data.label != '' ? '<div style=\"line-height: 1em;\"><small>' + escape(item.data.label) + '</small></div>' : '') +
                  '</div>';
         },
@@ -80,7 +82,7 @@ columnSelectInput <- function(inputId, label, data, choices = names,
       }")),
 
       # sort entries
-      list(sortField = I("'value'")),
+      # list(sortField = I("'value'")),
 
       # placeholder
       if (missing(placeholder)) list()
