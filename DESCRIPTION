@@ -1,12 +1,16 @@
 Package: shinyDataFilter
 Type: Package
-Version: 0.0.1.9000
+Version: 1.0.0
 Title: agnostic, idiomatic data filter module for shiny
 Description: a small data filter module for shiny.
 Authors@R: c(
       person(
           given = "Doug", family = "Kelkhoff", 
           email = "doug.kelkhoff@gmail.com", role = c("aut", "cre")
+      ),
+      person(
+          given = "liripo", 
+          email = "liripo@qq.com", role = c("editor",)
       )
     )
 Maintainer: Doug Kelkhoff <doug.kelkhoff@gmail.com>

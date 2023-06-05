@@ -69,6 +69,17 @@ proportionSelectInput <- function(inputId, label, vec, selected = "", ...,
                  '</div>';
         }
       }")),
+      # 复制粘贴
+      # https://github.com/rstudio/shiny/issues/2285-
+      list(
+        splitOn = I('function() { return /[, ]/; }()'),
+        create = I("function(input, callback){
+          return {
+            value: input,
+            text: input
+           };
+      }")),
+      
 
       # fix for highlight persisting
       # https://github.com/selectize/selectize.js/issues/1141

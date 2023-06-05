@@ -65,6 +65,16 @@ columnSelectInput <- function(inputId, label, data, choices = names,
         // avoid data vomit splashing on screen when an option is selected
         item: function(item, escape) { return ''; }
       }")),
+      # 复制粘贴
+      # https://github.com/rstudio/shiny/issues/2285-
+      list(
+        splitOn = I('function() { return /[, ]/; }()'),
+        create = I("function(input, callback){
+          return {
+            value: input,
+            text: input
+           };
+      }")),
 
       # fix for highlight persisting
       # https://github.com/selectize/selectize.js/issues/1141
